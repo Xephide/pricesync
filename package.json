@@ -1,8 +1,0 @@
-{
-  "name": "pricesync",
-  "version": "1.0.0",
-  "description": "Price sync tool",
-  "engines": {
-    "node": ">=18.0.0"
-  }
-}

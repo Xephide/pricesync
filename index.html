@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PriceSync — Яндекс Маркет</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0e0d;--surf:#161513;--surf2:#1c1b19;--surf3:#222120;--border:#2e2c2a;
+  --text:#d4d2cf;--muted:#7a7876;--faint:#4a4846;
+  --primary:#4f98a3;--prim-h:#227f8b;--prim-hl:#1e3336;
+  --success:#6daa45;--error:#dd6974;--warn:#fdab43;--orange:#e8963a;
+  --r-sm:6px;--r-md:8px;--r-lg:12px;--r-xl:16px;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;--s8:32px;--s10:40px;--s12:48px;--s16:64px;
+  --fnt:'Satoshi',sans-serif;--tr:180ms cubic-bezier(.16,1,.3,1);--sh:0 4px 16px rgba(0,0,0,.4);
+}
+[data-theme="light"]{
+  --bg:#f7f6f2;--surf:#fafaf7;--surf2:#ffffff;--surf3:#f3f1ec;--border:#dcdad5;
+  --text:#28251d;--muted:#7a7974;--faint:#bab9b4;--prim-hl:#cedcd8;--sh:0 4px 16px rgba(0,0,0,.08);
+}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:var(--fnt);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100dvh}
+button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
+input,select{font:inherit;color:inherit}table{border-collapse:collapse;width:100%}
+.app{display:flex;flex-direction:column;min-height:100dvh}
+.topbar{display:flex;align-items:center;gap:var(--s3);padding:0 var(--s6);height:52px;background:var(--surf);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:var(--s2);font-weight:700;font-size:15px;letter-spacing:-.3px;color:var(--text);margin-right:var(--s4)}
+.logo svg{color:var(--primary)}
+.nav-tabs{display:flex;gap:2px;flex:1}
+.nav-tab{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--r-md);font-size:13px;font-weight:500;color:var(--muted);transition:color var(--tr),background var(--tr);cursor:pointer}
+.nav-tab:hover{color:var(--text);background:var(--surf3)}
+.nav-tab.active{color:var(--primary);background:var(--prim-hl)}
+.nav-tab i{width:15px;height:15px}
+.topbar-right{display:flex;align-items:center;gap:var(--s2);margin-left:auto}
+.theme-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:var(--r-md);color:var(--muted);transition:color var(--tr),background var(--tr)}
+.theme-btn:hover{color:var(--text);background:var(--surf3)}
+.main{flex:1;padding:var(--s6);max-width:1400px;margin:0 auto;width:100%}
+.page{display:none}.page.active{display:block}
+.city-tabs{display:flex;gap:var(--s2);margin-bottom:var(--s6)}
+.city-tab{padding:8px 20px;border-radius:var(--r-xl);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr);border:1.5px solid var(--border);color:var(--muted);background:var(--surf)}
+.city-tab.active{border-color:var(--primary);color:var(--primary);background:var(--prim-hl)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--s3);margin-bottom:var(--s6)}
+.kpi{background:var(--surf);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--s4) var(--s4) var(--s3)}
+.kpi-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:var(--s2)}
+.kpi-val{font-size:22px;font-weight:700;color:var(--text);line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--s4)}
+.sec-title{font-size:15px;font-weight:700;color:var(--text)}
+.sec-actions{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r-md);font-size:13px;font-weight:600;transition:background var(--tr),color var(--tr),opacity var(--tr);cursor:pointer;border:none;white-space:nowrap}
+.btn i{width:14px;height:14px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.bp{background:var(--primary);color:#fff}.bp:hover:not(:disabled){background:var(--prim-h)}
+.bg{background:var(--surf3);color:var(--text);border:1px solid var(--border)}.bg:hover:not(:disabled){background:var(--surf2)}
+.bo{background:color-mix(in oklch,var(--orange) 15%,var(--surf));color:var(--orange);border:1px solid color-mix(in oklch,var(--orange) 30%,var(--border))}.bo:hover:not(:disabled){background:color-mix(in oklch,var(--orange) 25%,var(--surf))}
+.bsm{padding:6px 12px;font-size:12px}
+.tbl-wrap{background:var(--surf);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.tbl-wrap table th{background:var(--surf3);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.tbl-wrap table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;font-variant-numeric:tabular-nums;vertical-align:middle}
+.tbl-wrap table tr:last-child td{border-bottom:none}
+.tbl-wrap table tr:hover td{background:var(--surf3)}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--r-xl);font-size:11px;font-weight:600}
+.tok{background:color-mix(in oklch,var(--success) 15%,var(--surf));color:var(--success)}
+.terr{background:color-mix(in oklch,var(--error) 15%,var(--surf));color:var(--error)}
+.tld{background:color-mix(in oklch,var(--warn) 15%,var(--surf));color:var(--warn)}
+.tna{background:var(--surf3);color:var(--muted)}
+.dup{color:var(--success);font-size:11px}.ddn{color:var(--error);font-size:11px}.deq{color:var(--muted);font-size:11px}
+.prog-area{background:var(--surf);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--s5);margin-bottom:var(--s4);display:none}
+.prog-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s3)}
+.prog-title{font-size:13px;font-weight:600}
+.prog-count{font-size:12px;color:var(--muted)}
+.prog-track{height:6px;background:var(--surf3);border-radius:var(--r-xl);overflow:hidden}
+.prog-fill{height:100%;background:var(--primary);border-radius:var(--r-xl);transition:width .3s ease;width:0%}
+.bnr{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-radius:var(--r-md);margin-bottom:var(--s4)}
+.bnr-ok{background:color-mix(in oklch,var(--success) 12%,var(--surf));border:1px solid color-mix(in oklch,var(--success) 30%,var(--border));color:var(--success)}
+.bnr-err{background:color-mix(in oklch,var(--error) 12%,var(--surf));border:1px solid color-mix(in oklch,var(--error) 30%,var(--border));color:var(--error)}
+.bnr-ic i{width:20px;height:20px}.bnr-tx{display:flex;flex-direction:column;gap:2px}
+.bnr-tx strong{font-size:13px;font-weight:700}.bnr-tx span{font-size:12px;opacity:.8}
+.cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4)}
+@media(max-width:700px){.cfg-grid{grid-template-columns:1fr}}
+.cfg-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--s5)}
+.cfg-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:var(--s4);display:flex;align-items:center;gap:var(--s2)}
+.cfg-title i{width:15px;height:15px;color:var(--primary)}
+.cfg-row{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);margin-bottom:var(--s3)}
+.cfg-row:last-child{margin-bottom:0}
+.cfg-label{font-size:12px;color:var(--muted);font-weight:500;white-space:nowrap}
+.cfg-val{display:flex;align-items:center;gap:var(--s2)}
+.ci{padding:7px 10px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--surf3);color:var(--text);font-size:13px;outline:none;transition:border-color var(--tr)}
+.ci:focus{border-color:var(--primary)}
+.ci-wide{width:240px}.ci-mid{width:150px}.ci-sm{width:75px}
+.formula-hint{font-size:11px;color:var(--muted);padding:var(--s2) var(--s3);background:var(--surf3);border-radius:var(--r-md);margin-top:var(--s2)}
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5)}
+@media(max-width:900px){.stats-grid{grid-template-columns:1fr}}
+.stats-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.stats-card-hdr{padding:var(--s4) var(--s5);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.stats-card-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:var(--s2)}
+.stats-card-title i{width:16px;height:16px;color:var(--primary)}
+.stats-body{padding:var(--s4)}
+.funnel-table{width:100%;margin-bottom:var(--s5)}
+.funnel-table th{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;padding:6px 8px;text-align:right;border-bottom:1px solid var(--border)}
+.funnel-table th:first-child{text-align:left}
+.funnel-table td{padding:7px 8px;border-bottom:1px solid var(--border);font-size:12px;font-variant-numeric:tabular-nums;text-align:right}
+.funnel-table td:first-child{text-align:left;color:var(--muted);white-space:nowrap;font-size:11px}
+.funnel-table tr:last-child td{border-bottom:none}
+.funnel-table tr:hover td{background:var(--surf3)}
+.bar-cell{display:flex;align-items:center;gap:5px;justify-content:flex-end}
+.mini-bar{height:5px;background:var(--primary);border-radius:3px;opacity:.7;min-width:2px;flex-shrink:0}
+.mini-bar-c{height:5px;background:var(--warn);border-radius:3px;opacity:.7;min-width:2px}
+.mini-bar-o{height:5px;background:var(--success);border-radius:3px;opacity:.7;min-width:2px}
+.stat-num{font-weight:600;color:var(--text)}
+.stat-num-dim{color:var(--muted);font-size:11px}
+.cr-good{color:var(--success)}.cr-ok{color:var(--warn)}.cr-bad{color:var(--error)}
+.sepa{height:1px;background:var(--border);margin:var(--s4) 0}
+.toasts{position:fixed;bottom:var(--s6);right:var(--s6);display:flex;flex-direction:column;gap:var(--s2);z-index:999;pointer-events:none}
+.toast{padding:10px 16px;border-radius:var(--r-md);font-size:13px;font-weight:500;box-shadow:var(--sh);pointer-events:all;animation:slideIn .2s ease;display:flex;align-items:center;gap:var(--s2)}
+.toast-ok{background:var(--surf2);border:1px solid var(--border);color:var(--text)}
+.toast-err{background:color-mix(in oklch,var(--error) 15%,var(--surf));border:1px solid color-mix(in oklch,var(--error) 30%,var(--border));color:var(--error)}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+.sdot{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sdot-ok{background:var(--success)}.sdot-err{background:var(--error)}
+.sdot-ld{background:var(--warn);animation:blink .8s infinite}.sdot-na{background:var(--faint)}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--s16) var(--s8);text-align:center;color:var(--muted);gap:var(--s3)}
+.empty i{width:36px;height:36px;color:var(--faint)}
+.empty-title{font-size:14px;font-weight:600;color:var(--text)}.empty-sub{font-size:13px;max-width:32ch}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+/* funnel summary */
+.funnel-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s2);margin-bottom:var(--s4)}
+.fkpi{background:var(--surf3);border-radius:var(--r-md);padding:var(--s3);text-align:center}
+.fkpi-v{font-size:18px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+.fkpi-l{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.fkpi-arr{font-size:10px;color:var(--faint);margin:2px 0}
+
+.btn-su{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;border:1px solid var(--brd);background:var(--sf2);color:var(--muted);cursor:pointer;transition:all .15s;flex-shrink:0}
+.btn-su:hover:not(:disabled){background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-su:disabled{opacity:.3;cursor:not-allowed}
+.btn-su.su-ld{pointer-events:none;opacity:.6}
+.btn-su.su-ok{background:rgba(34,197,94,.15);border-color:#22c55e;color:#22c55e}
+.btn-su.su-err{background:rgba(239,68,68,.15);border-color:#ef4444;color:#ef4444}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-label="PriceSync">
+        <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+      PriceSync
+    </div>
+    <nav class="nav-tabs">
+      <button class="nav-tab active" onclick="gotoPage('prices')" id="tab-prices"><i data-lucide="tag"></i> Цены</button>
+      <button class="nav-tab" onclick="gotoPage('stats')" id="tab-stats"><i data-lucide="bar-chart-2"></i> Статистика</button>
+      <button class="nav-tab" onclick="gotoPage('settings')" id="tab-settings"><i data-lucide="settings"></i> Настройки</button>
+    </nav>
+    <div class="topbar-right">
+      <button class="theme-btn" data-theme-toggle aria-label="Тема">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
+  <main class="main">
+
+    <!-- PAGE: PRICES -->
+    <div class="page active" id="page-prices">
+      <div class="city-tabs">
+        <button class="city-tab active" onclick="switchCity('spb')" id="ctab-spb">🏙 Санкт-Петербург</button>
+        <button class="city-tab" onclick="switchCity('msk')" id="ctab-msk">🏛 Москва</button>
+      </div>
+      <div class="kpis" id="kpis">
+        <div class="kpi"><div class="kpi-label">Связок</div><div class="kpi-val" id="k0">—</div><div class="kpi-sub" id="k0s">загрузите из таблицы</div></div>
+        <div class="kpi"><div class="kpi-label">Наценка</div><div class="kpi-val" id="k1">—</div><div class="kpi-sub">маржа</div></div>
+        <div class="kpi"><div class="kpi-label">С ценой 1-опт</div><div class="kpi-val" id="k2">—</div><div class="kpi-sub" id="k2s"></div></div>
+        <div class="kpi"><div class="kpi-label">Данные обновлены</div><div class="kpi-val" id="k3" style="font-size:14px">—</div><div class="kpi-sub" id="k3s" style="font-size:11px">нет данных</div></div>
+      </div>
+      <div class="sec-hdr">
+        <div class="sec-title" id="city-label">Санкт-Петербург — Связки товаров</div>
+        <div class="sec-actions">
+          <button class="btn bg bsm" onclick="loadSheets()"><i data-lucide="download"></i> Из таблицы</button>
+          <button class="btn bo bsm" onclick="loadOptPrices()"><i data-lucide="database"></i> Цены 1-опт</button>
+          <button class="btn bg bsm" onclick="loadYa()"><i data-lucide="refresh-cw"></i> Цены Маркета</button>
+          <button class="btn bp bsm" id="updBtn" onclick="doUpdate()"><i data-lucide="upload"></i> Обновить на Маркете</button>
+        </div>
+      </div>
+      <div class="prog-area" id="progArea">
+        <div class="prog-hdr"><span class="prog-title">Обновление цен…</span><span class="prog-count" id="progTx">0/0</span></div>
+        <div class="prog-track"><div class="prog-fill" id="pf"></div></div>
+      </div>
+      <div id="updBnr"></div>
+      <div class="tbl-wrap">
+        <table id="mainTbl">
+          <thead>
+            <tr>
+              <th>Название товара (1-опт)</th>
+              <th>Артикул (offerId)</th>
+              <th>Закупка (1-опт)</th>
+              <th>Цена → Маркет</th>
+              <th>Текущая на Маркете</th>
+              <th>Разница</th>
+              <th>Статус</th>
+              <th style="width:40px"></th>
+            </tr>
+          </thead>
+          <tbody id="mainBody">
+            <tr><td colspan="8"><div class="empty"><i data-lucide="package"></i><div class="empty-title">Нет данных</div><div class="empty-sub">Загрузите связки из Google Таблицы</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE: STATS -->
+    <div class="page" id="page-stats">
+      <div class="sec-hdr">
+        <div class="sec-title">Воронка показов и продаж</div>
+        <div class="sec-actions">
+          <select id="statsPeriod" style="padding:7px 10px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--surf3);color:var(--text);font-size:13px;outline:none">
+            <option value="7">7 дней</option>
+            <option value="14">14 дней</option>
+            <option value="30" selected>30 дней</option>
+            <option value="60">60 дней</option>
+          </select>
+          <button class="btn bp bsm" onclick="loadStats()"><i data-lucide="refresh-cw"></i> Загрузить</button>
+        </div>
+      </div>
+      <div id="stats-loading" style="display:none;padding:var(--s8);text-align:center;color:var(--muted);font-size:13px">
+        <i data-lucide="loader-2" style="animation:spin 1s linear infinite;display:inline-block;width:20px;height:20px;vertical-align:middle"></i>
+        Генерация отчётов (10-20 сек)…
+      </div>
+      <div class="stats-grid" id="stats-grid">
+        <div class="stats-card">
+          <div class="stats-card-hdr"><div class="stats-card-title"><i data-lucide="map-pin"></i> Санкт-Петербург</div><div id="spb-total" style="font-size:12px;color:var(--muted)">—</div></div>
+          <div class="stats-body" id="spb-body">
+            <div class="empty"><i data-lucide="bar-chart-2"></i><div class="empty-title">Нет данных</div><div class="empty-sub">Нажмите «Загрузить»</div></div>
+          </div>
+        </div>
+        <div class="stats-card">
+          <div class="stats-card-hdr"><div class="stats-card-title"><i data-lucide="building-2"></i> Москва</div><div id="msk-total" style="font-size:12px;color:var(--muted)">—</div></div>
+          <div class="stats-body" id="msk-body">
+            <div class="empty"><i data-lucide="bar-chart-2"></i><div class="empty-title">Нет данных</div><div class="empty-sub">Нажмите «Загрузить»</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="sec-title" style="margin-bottom:var(--s5)">Настройки</div>
+      <div class="cfg-grid">
+        <div class="cfg-card">
+          <div class="cfg-title"><i data-lucide="percent"></i> Ценообразование</div>
+          <div class="cfg-row"><div class="cfg-label">Наценка (%)</div>
+            <div class="cfg-val"><input type="number" class="ci ci-sm" id="cA" value="10" step="1" min="0" max="200" oninput="syncMargin()"><span id="cpA" style="font-size:12px;color:var(--muted)">10%</span></div>
+          </div>
+          <div class="formula-hint">Цена = (закупка × (1 + X%) + 1 500 ₽) ÷ (1 − 0,323)</div>
+        </div>
+        <div class="cfg-card">
+          <div class="cfg-title"><i data-lucide="zap"></i> Яндекс Маркет</div>
+          <div class="cfg-row"><div class="cfg-label">Токен</div><input type="text" class="ci ci-wide" id="cfgTY" placeholder="ACMA:…" oninput="saveCfg()"></div>
+          <div class="cfg-row"><div class="cfg-label">Business ID</div><input type="text" class="ci ci-mid" id="cfgBiz" placeholder="216511608" oninput="saveCfg()"></div>
+          <div style="height:1px;background:var(--border);margin:var(--s3) 0"></div>
+          <div class="cfg-row"><div class="cfg-label">Campaign СПБ</div><input type="text" class="ci ci-mid" id="cfgCamSpb" placeholder="149001602" oninput="saveCfg()"></div>
+          <div class="cfg-row"><div class="cfg-label">Campaign МСК</div><input type="text" class="ci ci-mid" id="cfgCamMsk" placeholder="149000108" oninput="saveCfg()"></div>
+        </div>
+        <div class="cfg-card">
+          <div class="cfg-title"><i data-lucide="database"></i> 1-опт API</div>
+          <div class="cfg-row"><div class="cfg-label">Токен</div><input type="text" class="ci ci-wide" id="cfgTOpt" placeholder="bpOF9…" oninput="saveCfg()"></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:var(--s2)">СПБ: spb.xn--1--gmcep.xn--p1ai<br>МСК: msk.xn--1--gmcep.xn--p1ai</div>
+        </div>
+        <div class="cfg-card">
+          <div class="cfg-title"><i data-lucide="table"></i> Google Таблица</div>
+          <div class="cfg-row"><div class="cfg-label">ID таблицы</div><input type="text" class="ci ci-wide" id="cfgSId" placeholder="1uOFKC9p…" oninput="saveCfg()"></div>
+          <div class="cfg-row"><div class="cfg-label">API ключ</div><input type="text" class="ci ci-wide" id="cfgSKey" placeholder="AIzaSy…" oninput="saveCfg()"></div>
+          <div style="height:1px;background:var(--border);margin:var(--s3) 0"></div>
+          <div class="cfg-row"><div class="cfg-label">Лист СПБ</div><input type="text" class="ci ci-wide" id="cfgShSpb" placeholder="Связки iFlow (СПБ)" oninput="saveCfg()"></div>
+          <div class="cfg-row"><div class="cfg-label">Лист МСК</div><input type="text" class="ci ci-wide" id="cfgShMsk" placeholder="Связки iFlow (МСК)" oninput="saveCfg()"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="toasts" id="toasts"></div>
+<style>
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+<script>
+// ── Кэш (localStorage) ──
+const LS_KEY='pricesync_v3';
+function lsSave(){
+  try{
+    const data={
+      margin:S.margin,
+      cfg:S.cfg,
+      spb_bindings:S.spb.B,
+      msk_bindings:S.msk.B,
+      spb_lastSync:S.spb.lastSync,
+      msk_lastSync:S.msk.lastSync,
+      savedAt:Date.now()
+    };
+    localStorage.setItem(LS_KEY,JSON.stringify(data));
+  }catch(e){}
+}
+function lsLoad(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw)return null;
+    return JSON.parse(raw);
+  }catch(e){return null;}
+}
+
+const _defaults={
+  tY:'ACMA:Yi22yHrHmf1zy2fsSLncfbVIYqzUNn4Mhno45znA:192b7e8e',
+  bizId:'216511608',
+  camSpb:'149001602',
+  camMsk:'149000108',
+  tOpt:'bpOF9MR99tRqKi5zG0N7RYpq0JCjMdY9',
+  sId:'1uOFKC9pkQF1FLfB7fAcf0M5b27EXwpvyhhF2lXrJv4w',
+  sKey:'AIzaSyBHT8sf4sX-XRHTSSz_hm9koPvCo1dAvEk',
+  shSpb:'Связки iFlow (СПБ)',
+  shMsk:'Связки iFlow (МСК)'
+};
+
+const _saved=lsLoad();
+const S={
+  city:'spb',
+  spb:{B:_saved?.spb_bindings||[],us:{},lastSync:_saved?.spb_lastSync||null},
+  msk:{B:_saved?.msk_bindings||[],us:{},lastSync:_saved?.msk_lastSync||null},
+  margin:_saved?.margin??10,
+  cfg:Object.assign({},_defaults,_saved?.cfg||{})
+};
+const C=()=>S[S.city];
+const sell=(b,m)=>b?Math.round((b*(1+m/100)+1500)/(1-0.323)):null;
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const FN='/.netlify/functions';
+
+// ── Navigation ──
+function gotoPage(p){
+  document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(e=>e.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('tab-'+p).classList.add('active');
+  if(p==='stats'&&!S._statsLoaded)loadStats();
+}
+
+// ── City ──
+function switchCity(c){
+  S.city=c;
+  ['spb','msk'].forEach(x=>{
+    document.getElementById('ctab-'+x).classList.toggle('active',x===c);
+  });
+  document.getElementById('city-label').textContent=(c==='spb'?'Санкт-Петербург':'Москва')+' — Связки товаров';
+  updKPI();rAll();
+}
+
+// ── KPI ──
+function updKPI(){
+  const c=C();
+  const withPrice=c.B.filter(b=>b.buyPrice).length;
+  document.getElementById('k0').textContent=c.B.length;
+  document.getElementById('k0s').textContent=c.B.length?'связок загружено':'загрузите из таблицы';
+  document.getElementById('k1').textContent=S.margin+'%';
+  document.getElementById('k2').textContent=withPrice;
+  document.getElementById('k2s').textContent=withPrice?`из ${c.B.length}`:'нет цен';
+  if(c.lastSync){
+    const d=new Date(c.lastSync);
+    const isToday=new Date().toDateString()===d.toDateString();
+    document.getElementById('k3').textContent=isToday
+      ?d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})
+      :d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});
+    document.getElementById('k3s').textContent='из кэша';
+  }else{
+    document.getElementById('k3').textContent='—';
+    document.getElementById('k3s').textContent='нет данных';
+  }
+}
+
+// ── Render ──
+function rAll(){
+  updKPI();
+  const c=C();
+  const tbody=document.getElementById('mainBody');
+  if(!c.B.length){
+    tbody.innerHTML='<tr><td colspan="8"><div class="empty"><i data-lucide="package"></i><div class="empty-title">Нет данных</div><div class="empty-sub">Загрузите связки из Google Таблицы</div></div></td></tr>';
+    lucide.createIcons({nodes:[tbody]});return;
+  }
+  tbody.innerHTML=c.B.map(b=>{
+    const sp=sell(b.buyPrice,S.margin);
+    const df=(sp!=null&&b.mktPrice!=null)?sp-b.mktPrice:null;
+    const dfHtml=df===null?'<span class="deq">—</span>'
+      :df>50?`<span class="dup">↑ +${Math.round(df).toLocaleString('ru-RU')} ₽</span>`
+      :df<-50?`<span class="ddn">↓ ${Math.round(df).toLocaleString('ru-RU')} ₽</span>`
+      :'<span class="deq">≈ совпадает</span>';
+    const st=c.us[b.article];
+    const errTxt=st?.m?`<span style="display:block;font-size:10px;opacity:.75;margin-top:2px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(st.m)}">${esc(st.m)}</span>`:'';
+    const stHtml=!st?'<span class="tag tna">—</span>'
+      :st.s==='ok'?'<span class="tag tok"><span class="sdot sdot-ok"></span>OK</span>'
+      :st.s==='err'?`<span class="tag terr" title="${esc(st.m||'')}"><span class="sdot sdot-err"></span>Ошибка${errTxt}</span>`
+      :'<span class="tag tld"><span class="sdot sdot-ld"></span>Обновление…</span>';
+    const safeId=b.article.replace(/[^a-zA-Z0-9]/g,'_');
+    return`<tr>
+      <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(b.name||'')}">${esc(b.name||'—')}</td>
+      <td style="font-family:monospace;font-size:12px">${esc(b.article)}</td>
+      <td>${b.buyPrice?b.buyPrice.toLocaleString('ru-RU')+' ₽':'<span style="color:var(--muted)">—</span>'}</td>
+      <td style="font-weight:600;color:var(--primary)">${sp?sp.toLocaleString('ru-RU')+' ₽':'<span style="color:var(--muted)">—</span>'}</td>
+      <td>${b.mktPrice?b.mktPrice.toLocaleString('ru-RU')+' ₽':'<span style="color:var(--muted)">—</span>'}</td>
+      <td>${dfHtml}</td>
+      <td>${stHtml}</td>
+      <td><button class="btn-su" onclick="updateSingle('${esc(b.article)}')" title="Обновить цену на Маркете" ${!b.buyPrice?'disabled':''} id="su_${safeId}"><i data-lucide="upload" style="width:13px;height:13px"></i></button></td>
+    </tr>`;
+  }).join('');
+  lucide.createIcons({nodes:[tbody]});
+}
+
+
+// ── Одиночное обновление цены ──
+async function updateSingle(article){
+  const{tY,bizId,camSpb,camMsk}=S.cfg;
+  if(!tY){toast('Укажите токен Яндекс Маркета','err');return;}
+  const bid=bizId||'216511608';
+  const campaignId=S.city==='spb'?(camSpb||'149001602'):(camMsk||'149000108');
+  const c=C();
+  const b=c.B.find(x=>x.article===article);
+  if(!b||!b.buyPrice){toast('Нет закупочной цены для этого товара','err');return;}
+  const safeId=article.replace(/[^a-zA-Z0-9]/g,'_');
+  const btn=document.getElementById('su_'+safeId);
+  if(btn){btn.classList.add('su-ld');btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .8s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>';}
+  c.us[article]={s:'ld'};rAll();
+  const price=Math.round(sell(b.buyPrice,S.margin));
+  const offers=[{offerId:article,price:{value:price,currencyId:'RUR',vat:6}}];
+  try{
+    const r=await fetch(`${FN}/update-prices`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tY,bizId:bid,campaignId,offers})});
+    const d=await r.json();
+    if(!r.ok||d.status==='ERROR'){
+      const msg=d.error||d.errors?.[0]?.message||`HTTP ${r.status}`;
+      c.us[article]={s:'err',m:msg};toast(`❌ ${article}: ${msg}`,'err');
+      if(btn){btn.classList.remove('su-ld');btn.classList.add('su-err');btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>';setTimeout(()=>{btn.classList.remove('su-err');btn.innerHTML='<i data-lucide="upload" style="width:13px;height:13px"></i>';lucide.createIcons({nodes:[btn]});},4000);}
+    }else{
+      c.us[article]={s:'ok'};b.mktPrice=price;toast(`✓ Цена обновлена: ${article}`);
+      if(btn){btn.classList.remove('su-ld');btn.classList.add('su-ok');btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>';setTimeout(()=>{btn.classList.remove('su-ok');btn.innerHTML='<i data-lucide="upload" style="width:13px;height:13px"></i>';lucide.createIcons({nodes:[btn]});},3000);}
+    }
+  }catch(e){
+    c.us[article]={s:'err',m:e.message};toast('Ошибка сети: '+e.message,'err');
+    if(btn){btn.classList.remove('su-ld');btn.classList.add('su-err');btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>';setTimeout(()=>{btn.classList.remove('su-err');btn.innerHTML='<i data-lucide="upload" style="width:13px;height:13px"></i>';lucide.createIcons({nodes:[btn]});},4000);}
+  }
+  lsSave();rAll();
+}
+
+function clearStatsCache(){
+  statsCacheClear();
+  ['spb-total','msk-total'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='кэш очищен';});
+  toast('Кэш статистики очищен');
+}
+
+// ── Load Sheets (read-only) ──
+async function loadSheets(){
+  const{sId,sKey,shSpb,shMsk}=S.cfg;
+  if(!sId||!sKey){toast('Укажите ID таблицы и API ключ','err');return;}
+  const sheet=S.city==='spb'?shSpb:shMsk;
+  toast('Загрузка из таблицы…');
+  try{
+    const r=await fetch(`${FN}/sheets-read?id=${encodeURIComponent(sId)}&key=${encodeURIComponent(sKey)}&sheet=${encodeURIComponent(sheet)}`);
+    const d=await r.json();
+    if(!d.ok)throw new Error(d.error||'Ошибка');
+    const c=C();
+    c.B=d.bindings.map(nb=>{
+      const ex=c.B.find(b=>b.article===nb.article);
+      return{name:nb.name,article:nb.article,buyPrice:ex?.buyPrice||null,mktPrice:ex?.mktPrice||null};
+    });
+    c.lastSync=new Date().toISOString();
+    toast(`Загружено ${d.total} связок (${S.city.toUpperCase()})`);
+    lsSave();rAll();
+  }catch(e){toast('Ошибка таблицы: '+e.message,'err');}
+}
+
+// ── Load 1-opt prices ──
+// Сопоставление: article в таблице = offerId Маркета, name в таблице = название в 1-опт
+// Фид содержит {id, name, price, ...} — ищем по полному совпадению имени
+async function loadOptPrices(){
+  const{tOpt}=S.cfg;
+  if(!tOpt){toast('Укажите токен 1-опт','err');return;}
+  const c=C();
+  if(!c.B.length){toast('Сначала загрузите связки из таблицы','err');return;}
+  const isSpb=S.city==='spb';
+  // Punycode домен: xn--1--gmcep.xn--p1ai
+  const feedHost=isSpb?'spb.xn--1--gmcep.xn--p1ai':'msk.xn--1--gmcep.xn--p1ai';
+  const feedId=isSpb?'0b843674-f7b9-419d-a483-b3833323f2d4':'b9fa46b8-7c79-4bc0-bb8f-cd655d62149e';
+  const feedUrl=`https://${feedHost}/feed-json/${feedId}`;
+  toast('Загрузка фида 1-опт…');
+  try{
+    const r=await fetch(`${FN}/fetch-feed?url=${encodeURIComponent(feedUrl)}&token=${encodeURIComponent(tOpt)}`);
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    const d=await r.json();
+    const products=d.products||[];
+    if(!products.length)throw new Error('Фид пуст или неверный формат');
+    // Строим индекс name→price (нормализованное имя)
+    const priceMap={};
+    products.forEach(p=>{
+      if(p.name&&p.price){
+        priceMap[p.name.trim().toLowerCase()]=parseFloat(p.price);
+        priceMap[p.name.trim()]=parseFloat(p.price); // точное совпадение
+      }
+    });
+    let matched=0,notFound=[];
+    c.B.forEach(b=>{
+      const n=b.name||'';
+      const p=priceMap[n.trim()]||priceMap[n.trim().toLowerCase()];
+      if(p!=null){b.buyPrice=p;matched++;}
+      else notFound.push(n.slice(0,40));
+    });
+    c.lastSync=new Date().toISOString();
+    toast(`1-опт: ${matched}/${c.B.length} сопоставлено. Всего в фиде: ${products.length}`);
+    if(notFound.length&&notFound.length<=5)
+      toast('Не найдено: '+notFound.join(', '),'err');
+    else if(notFound.length>5)
+      toast(`Не найдено ${notFound.length} товаров. Проверьте имена в таблице.`,'err');
+    lsSave();rAll();
+  }catch(e){toast('Ошибка 1-опт: '+e.message,'err');}
+}
+
+// ── Load Yandex prices ──
+async function loadYa(){
+  const{tY,bizId}=S.cfg;
+  if(!tY){toast('Укажите токен Яндекс Маркета','err');return;}
+  const bid=bizId||'216511608';
+  toast('Загрузка цен с Маркета…');
+  try{
+    const allOffers=[];
+    let nextToken=null,page=0;
+    do{
+      let url=`${FN}/yandex-prices?token=${encodeURIComponent(tY)}&bizId=${bid}`;
+      if(nextToken)url+=`&page_token=${encodeURIComponent(nextToken)}`;
+      const r=await fetch(url);
+      if(!r.ok)throw new Error(`HTTP ${r.status}`);
+      const d=await r.json();
+      if(d.status!=='OK')throw new Error(d.errors?.[0]?.message||'API error');
+      allOffers.push(...(d.result?.offerMappings||[]));
+      nextToken=d.result?.paging?.nextPageToken||null;
+      page++;
+    }while(nextToken&&page<20);
+    let ok=0;
+    const c=C();
+    allOffers.forEach(m=>{
+      const o=m.offer;if(!o)return;
+      const price=o.basicPrice?.value;if(!price)return;
+      const idx=c.B.findIndex(b=>b.article===o.offerId);
+      if(idx!==-1){c.B[idx].mktPrice=parseFloat(price);ok++;}
+    });
+    c.lastSync=new Date().toISOString();
+    toast(`Маркет: ${ok} совпадений из ${allOffers.length}`);lsSave();rAll();
+  }catch(e){toast('Ошибка Маркета: '+e.message,'err');}
+}
+
+// ── Update prices (batches of 20, 3 parallel) ──
+async function doUpdate(){
+  const{tY,bizId,camSpb,camMsk}=S.cfg;
+  if(!tY){toast('Укажите токен','err');return;}
+  const bid=bizId||'216511608';
+  const campaignId=S.city==='spb'?(camSpb||'149001602'):(camMsk||'149000108');
+  const c=C();
+  const todo=c.B.filter(b=>b.buyPrice&&b.article);
+  if(!todo.length){toast('Нет товаров с ценами','err');return;}
+  document.getElementById('progArea').style.display='block';
+  document.getElementById('updBtn').disabled=true;
+  document.getElementById('updBnr').innerHTML='';
+  todo.forEach(b=>{c.us[b.article]={s:'ld'};});rAll();
+  // FIX: строго последовательные батчи — Яндекс лимитирует 2 параллельных запроса
+  // Батчи по 50 (до 500 по доке, 50 для надёжности), 1 за раз, задержка 600мс
+  const BATCH=50;
+  const batches=[];
+  for(let i=0;i<todo.length;i+=BATCH)batches.push(todo.slice(i,i+BATCH));
+  let done=0,errs=0;
+  const proc=async(batch)=>{
+    const offers=batch.map(b=>({offerId:b.article,price:{value:Math.round(sell(b.buyPrice,S.margin)),currencyId:'RUR',vat:6}}));
+    try{
+      const r=await fetch(`${FN}/update-prices`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tY,bizId:bid,campaignId,offers})});
+      const d=await r.json();
+      if(!r.ok||d.status==='ERROR'){
+        const msg=d.error||d.errors?.[0]?.message||`HTTP ${r.status}`;
+        batch.forEach(b=>{c.us[b.article]={s:'err',m:msg};errs++;});
+      }else{batch.forEach(b=>{c.us[b.article]={s:'ok'};b.mktPrice=Math.round(sell(b.buyPrice,S.margin));});}
+    }catch(e){batch.forEach(b=>{c.us[b.article]={s:'err',m:e.message};errs++;});}
+    done+=batch.length;
+    document.getElementById('pf').style.width=Math.round((done/todo.length)*100)+'%';
+    document.getElementById('progTx').textContent=`${done}/${todo.length}`;
+    rAll();
+  };
+  // Строго последовательно, задержка 600мс между батчами
+  for(let i=0;i<batches.length;i++){
+    await proc(batches[i]);
+    if(i<batches.length-1)await new Promise(r=>setTimeout(r,600));
+  }
+  document.getElementById('pf').style.width='100%';
+  document.getElementById('updBtn').disabled=false;
+  c.lastSync=new Date().toISOString();
+  lsSave();
+  const bn=document.getElementById('updBnr');
+  bn.innerHTML=errs===0
+    ?`<div class="bnr bnr-ok"><div class="bnr-ic"><i data-lucide="check-circle-2"></i></div><div class="bnr-tx"><strong>Все цены обновлены!</strong><span>${done} товаров ×${S.margin}%</span></div></div>`
+    :`<div class="bnr bnr-err"><div class="bnr-ic"><i data-lucide="alert-circle"></i></div><div class="bnr-tx"><strong>Обновлено с ошибками</strong><span>OK: ${done-errs}, ошибок: ${errs}</span></div></div>`;
+  lucide.createIcons({nodes:[bn]});rAll();
+}
+
+// ══════════════════════════════════════════════
+// STATISTICS — воронка показов и продаж
+// Используем асинхронный отчёт reports/shows-sales
+// ══════════════════════════════════════════════
+// Кэш статистики: ключ = "city_days", хранит {rows, ts}
+const STATS_TTL=23*60*60*1000;
+function statsCacheGet(key){try{const raw=localStorage.getItem('sc_'+key);if(!raw)return null;const d=JSON.parse(raw);if(Date.now()-d.ts>STATS_TTL){localStorage.removeItem('sc_'+key);return null;}return d;}catch(e){return null;}}
+function statsCacheSet(key,rows){try{localStorage.setItem('sc_'+key,JSON.stringify({rows,ts:Date.now()}));}catch(e){}}
+function statsCacheClear(){try{Object.keys(localStorage).filter(k=>k.startsWith('sc_')).forEach(k=>localStorage.removeItem(k));}catch(e){}}
+
+async function loadStats(){
+  S._statsLoaded=true;
+  const{tY,camSpb,camMsk}=S.cfg;
+  if(!tY){toast('Укажите токен Яндекс Маркета','err');return;}
+  const days=parseInt(document.getElementById('statsPeriod').value)||30;
+  const dateTo=new Date();
+  const dateFrom=new Date(+dateTo-days*86400000);
+  const fmtDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const dfStr=fmtDate(dateFrom),dtStr=fmtDate(dateTo);
+  document.getElementById('stats-loading').style.display='block';
+  document.getElementById('stats-grid').style.opacity='.4';
+  // FIX: строго последовательно — лимит 10 запросов/час на /reports/shows-sales/generate
+  // Сначала СПБ, потом МСК с паузой 3 сек между ними
+  toast('Загрузка СПБ… (затем МСК, ~30-60 сек)');
+  try{
+    await loadCityStats(camSpb||'149001602',dfStr,dtStr,'spb',days);
+    // Пауза между запросами — избегаем rate limit
+    await new Promise(r=>setTimeout(r,3000));
+    await loadCityStats(camMsk||'149000108',dfStr,dtStr,'msk',days);
+  }finally{
+    document.getElementById('stats-loading').style.display='none';
+    document.getElementById('stats-grid').style.opacity='1';
+    lucide.createIcons();
+  }
+}
+
+async function loadCityStats(campaignId,dateFrom,dateTo,prefix,days){
+  const{tY}=S.cfg;
+  const bodyEl=document.getElementById(prefix+'-body');
+  const totEl=document.getElementById(prefix+'-total');
+  const cityName=prefix==='spb'?'Санкт-Петербург':'Москва';
+
+  // Проверяем кэш
+  const cacheKey=`${prefix}_${days}`;
+  const cached=statsCacheGet(cacheKey);
+  if(cached){
+    totEl.textContent='из кэша · '+new Date(cached.ts).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+    renderFunnel(cached.rows,prefix,totEl,bodyEl);
+    return;
+  }
+
+  // Показываем статус загрузки
+  totEl.textContent='Загрузка…';
+  bodyEl.innerHTML=`<div style="color:var(--muted);font-size:13px;padding:var(--s6);text-align:center"><span style="display:inline-flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Генерируем отчёт ${cityName}…</span></div>`;
+
+  try{
+    // 1. generate report
+    const genR=await fetch(`${FN}/shows-sales-generate`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({token:tY,campaignId,dateFrom,dateTo,grouping:'OFFERS'})
+    });
+    const genD=await genR.json();
+    if(genR.status===429||genR.status===420){
+      throw new Error('Лимит запросов (10/час). Подождите ~1 час и повторите.');
+    }
+    if(!genD.reportId)throw new Error(genD.error||'Не удалось создать отчёт');
+    const reportId=genD.reportId;
+
+    // 2. poll до DONE, интервал 3 сек (чтобы не спамить)
+    let fileUrl=null,attempts=0;
+    while(attempts<30){
+      await new Promise(r=>setTimeout(r,3000));
+      const infoR=await fetch(`${FN}/shows-sales-info?token=${encodeURIComponent(tY)}&reportId=${reportId}`);
+      const infoD=await infoR.json();
+      if(infoD.status==='DONE'){fileUrl=infoD.fileUrl;break;}
+      if(infoD.status==='FAILED')throw new Error('Отчёт не сформирован: '+( infoD.error||''));
+      attempts++;
+      bodyEl.innerHTML=`<div style="color:var(--muted);font-size:13px;padding:var(--s6);text-align:center">⏳ Генерируем отчёт ${cityName}… (${attempts*3} сек)</div>`;
+    }
+    if(!fileUrl)throw new Error('Таймаут: отчёт не готов за 90 сек');
+
+    // 3. скачиваем и парсим
+    const xlsxR=await fetch(`${FN}/parse-xlsx?url=${encodeURIComponent(fileUrl)}&token=${encodeURIComponent(tY)}`);
+    const xlsxD=await xlsxR.json();
+    if(!xlsxD.ok)throw new Error(xlsxD.error||'Ошибка парсинга XLSX');
+
+    // Сохраняем в кэш
+    statsCacheSet(cacheKey,xlsxD.rows);
+    renderFunnel(xlsxD.rows,prefix,totEl,bodyEl);
+  }catch(e){
+    totEl.textContent='Ошибка';
+    const isRateLimit=e.message.includes('Лимит');
+    bodyEl.innerHTML=`<div style="color:var(--${isRateLimit?'warn':'error'});font-size:13px;padding:var(--s4) var(--s5)">
+      <div style="display:flex;align-items:flex-start;gap:8px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div>${esc(e.message)}</div>
+      </div>
+    </div>`;
+  }
+}
+
+function renderFunnel(rows,prefix,totEl,bodyEl){
+  // rows: [{day, shows, clicks, cart, orders, revenue}]
+  if(!rows||!rows.length){
+    bodyEl.innerHTML='<div style="color:var(--muted);font-size:13px;padding:var(--s4);text-align:center">Нет данных за этот период</div>';
+    totEl.textContent='Нет данных';return;
+  }
+  // Агрегируем по дням
+  const byDay={};
+  rows.forEach(r=>{
+    const d=r.day;
+    if(!byDay[d])byDay[d]={shows:0,clicks:0,cart:0,orders:0,revenue:0};
+    byDay[d].shows+=r.shows||0;
+    byDay[d].clicks+=r.clicks||0;
+    byDay[d].cart+=r.cart||0;
+    byDay[d].orders+=r.orders||0;
+    byDay[d].revenue+=r.revenue||0;
+  });
+  const days=Object.keys(byDay).sort((a,b)=>{
+    const parseDay=(v)=>{
+      if(/^\d{4}-\d{2}-\d{2}$/.test(v)) return new Date(v+'T00:00:00').getTime();
+      if(/^\d{2}\.\d{2}(\.\d{4})?$/.test(v)){
+        const parts=v.split('.');
+        const dd=parseInt(parts[0],10), mm=parseInt(parts[1],10)-1;
+        let yyyy=parts[2]?parseInt(parts[2],10):new Date().getFullYear();
+        // если дата без года и месяц больше текущего, значит это прошлый год
+        const now=new Date();
+        if(!parts[2] && mm>now.getMonth()) yyyy-=1;
+        return new Date(yyyy,mm,dd).getTime();
+      }
+      const t=Date.parse(v);
+      return Number.isNaN(t)?0:t;
+    };
+    return parseDay(a)-parseDay(b);
+  });
+  const totShows=days.reduce((s,d)=>s+byDay[d].shows,0);
+  const totClicks=days.reduce((s,d)=>s+byDay[d].clicks,0);
+  const totCart=days.reduce((s,d)=>s+byDay[d].cart,0);
+  const totOrders=days.reduce((s,d)=>s+byDay[d].orders,0);
+  const totRev=days.reduce((s,d)=>s+byDay[d].revenue,0);
+  const cr1=totShows?((totClicks/totShows)*100).toFixed(1):0;
+  const cr2=totClicks?((totCart/totClicks)*100).toFixed(1):0;
+  const cr3=totCart?((totOrders/totCart)*100).toFixed(1):0;
+  totEl.textContent=`${totShows.toLocaleString('ru-RU')} показов · ${totOrders} заказов`;
+  // Funnel summary KPIs
+  const fkHtml=`<div class="funnel-kpis">
+    <div class="fkpi"><div class="fkpi-v">${totShows.toLocaleString('ru-RU')}</div><div class="fkpi-l">Показы</div></div>
+    <div class="fkpi"><div class="fkpi-v">${totClicks.toLocaleString('ru-RU')}</div><div class="fkpi-l">Клики</div><div class="fkpi-arr ${cr1>=5?'cr-good':cr1>=2?'cr-ok':'cr-bad'}">${cr1}% CTR</div></div>
+    <div class="fkpi"><div class="fkpi-v">${totCart.toLocaleString('ru-RU')}</div><div class="fkpi-l">В корзину</div><div class="fkpi-arr ${cr2>=10?'cr-good':cr2>=5?'cr-ok':'cr-bad'}">${cr2}%</div></div>
+    <div class="fkpi"><div class="fkpi-v">${totOrders}</div><div class="fkpi-l">Заказы</div><div class="fkpi-arr ${cr3>=30?'cr-good':cr3>=15?'cr-ok':'cr-bad'}">${cr3}%</div></div>
+  </div>`;
+  // Day table
+  const maxShows=Math.max(...days.map(d=>byDay[d].shows),1);
+  const maxClicks=Math.max(...days.map(d=>byDay[d].clicks),1);
+  const tblRows=days.map(day=>{
+    const{shows,clicks,cart,orders,revenue}=byDay[day];
+    const ctr=shows?((clicks/shows)*100).toFixed(1):0;
+    const bW=Math.max(Math.round((shows/maxShows)*80),2);
+    const bWc=Math.max(Math.round((clicks/maxClicks)*40),2);
+    const dateF=day.replace(/^(\d{2})-(\d{2})-(\d{4})$/,'$1.$2').replace(/^(\d{4})-(\d{2})-(\d{2})$/,(m,y,mo,dd)=>`${dd}.${mo}`);
+    return`<tr>
+      <td>${dateF}</td>
+      <td class="stat-num"><div class="bar-cell"><div class="mini-bar" style="width:${bW}px"></div>${shows.toLocaleString('ru-RU')}</div></td>
+      <td><div class="bar-cell"><div class="mini-bar-c" style="width:${bWc}px"></div>${clicks}</div></td>
+      <td class="${parseFloat(ctr)>=5?'cr-good':parseFloat(ctr)>=2?'cr-ok':'cr-bad'}">${ctr}%</td>
+      <td>${cart}</td>
+      <td>${orders}</td>
+      <td class="${revenue>0?'cr-good':''}">${revenue>0?Math.round(revenue).toLocaleString('ru-RU')+' ₽':'—'}</td>
+    </tr>`;
+  }).join('');
+  bodyEl.innerHTML=fkHtml+`<table class="funnel-table">
+    <thead><tr>
+      <th>Дата</th>
+      <th>Показы</th>
+      <th>Клики</th>
+      <th>CTR</th>
+      <th>Корзина</th>
+      <th>Заказы</th>
+      <th>Выручка</th>
+    </tr></thead>
+    <tbody>${tblRows}</tbody>
+  </table>`;
+}
+
+// ── Config ──
+function syncMargin(){
+  const v=parseFloat(document.getElementById('cA').value)||10;
+  S.margin=v;
+  document.getElementById('cpA').textContent=`${v}%`;
+  lsSave();rAll();
+}
+function saveCfg(){
+  S.cfg.tY=document.getElementById('cfgTY').value.trim();
+  S.cfg.bizId=document.getElementById('cfgBiz').value.trim();
+  S.cfg.camSpb=document.getElementById('cfgCamSpb').value.trim();
+  S.cfg.camMsk=document.getElementById('cfgCamMsk').value.trim();
+  S.cfg.tOpt=document.getElementById('cfgTOpt').value.trim();
+  S.cfg.sId=document.getElementById('cfgSId').value.trim();
+  S.cfg.sKey=document.getElementById('cfgSKey').value.trim();
+  S.cfg.shSpb=document.getElementById('cfgShSpb').value.trim();
+  S.cfg.shMsk=document.getElementById('cfgShMsk').value.trim();
+  lsSave();
+}
+function loadCfg(){
+  document.getElementById('cfgTY').value=S.cfg.tY;
+  document.getElementById('cfgBiz').value=S.cfg.bizId;
+  document.getElementById('cfgCamSpb').value=S.cfg.camSpb;
+  document.getElementById('cfgCamMsk').value=S.cfg.camMsk;
+  document.getElementById('cfgTOpt').value=S.cfg.tOpt;
+  document.getElementById('cfgSId').value=S.cfg.sId;
+  document.getElementById('cfgSKey').value=S.cfg.sKey;
+  document.getElementById('cfgShSpb').value=S.cfg.shSpb;
+  document.getElementById('cfgShMsk').value=S.cfg.shMsk;
+  document.getElementById('cA').value=S.margin;
+  syncMargin();
+}
+
+// ── Toast ──
+function toast(msg,type='ok'){
+  const el=document.createElement('div');
+  el.className=`toast toast-${type}`;
+  el.innerHTML=`<i data-lucide="${type==='err'?'alert-circle':'check'}" style="width:14px;height:14px"></i>${msg}`;
+  document.getElementById('toasts').appendChild(el);
+  lucide.createIcons({nodes:[el]});
+  setTimeout(()=>el.remove(),4500);
+}
+
+// ── Theme ──
+(function(){
+  const t=document.querySelector('[data-theme-toggle]');
+  const r=document.documentElement;
+  let d=r.getAttribute('data-theme')||'dark';
+  t&&t.addEventListener('click',()=>{
+    d=d==='dark'?'light':'dark';r.setAttribute('data-theme',d);
+    t.innerHTML=d==='dark'
+      ?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+      :'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+  });
+})();
+
+window.addEventListener('DOMContentLoaded',()=>{
+  lucide.createIcons();loadCfg();
+  // Если есть кэшированные данные — сразу рисуем, не дёргаем API
+  const saved=lsLoad();
+  if(saved){
+    // Показываем метку времени кэша
+    const age=Math.round((Date.now()-saved.savedAt)/60000);
+    const ageStr=age<60?`${age} мин назад`:`${Math.round(age/60)} ч назад`;
+    document.getElementById('k3').textContent=age<1440?ageStr:'давно';
+  }
+  rAll();
+  // Если кэша нет совсем — автозагружаем из Sheets
+  if(!saved&&S.cfg.sId&&S.cfg.sKey){
+    setTimeout(async()=>{
+      await loadSheets();
+      S.city='msk';await loadSheets();
+      S.city='spb';rAll();
+    },600);
+  }
+});
+</script>
+</body>
+</html>
